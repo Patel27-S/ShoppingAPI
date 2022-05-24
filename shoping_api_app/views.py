@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from store.models import Product, ShoppingCart
+from .models import Product, ShoppingCart
 
 
 def index(request):
