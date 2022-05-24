@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',  # including the 3rd party app.
+    'django_filters',  # one more 3rd party app.
     'shoping_api_app',  # app for this project.
 ]
 
