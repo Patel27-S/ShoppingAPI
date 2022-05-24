@@ -1,7 +1,7 @@
 # ShoppingAPI
 
 Here, we are creating API endpoints for Product Shopping. 
-Different Functionalities such as Adding a Product, Updating Product's Details, Filtering for a Product and extracting various other informations would be made possible with the helo of this API>
+Different Functionalities such as Adding a Product, Updating Product's Details, Filtering for a Product and extracting various other informations would be made possible with the helo of this API.
 
 There are three models for this problem with whom the interaction would be possible, namely :- Product, Shopping Cart, Shopping Cart Item.
 
