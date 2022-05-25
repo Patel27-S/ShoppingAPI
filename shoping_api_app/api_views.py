@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
@@ -94,5 +94,27 @@ class ProductCreate(CreateAPIView):
         except ValidationError:
             raise ValidationError({'price': 'Price has to be a number.'})
         # Returning the super().create() method eventually, meaning the data would
-        # be stored in the database.
+        # be stored in the database. And, create() returns the created object. So,
+        # the client would be able to see the created object on UI. Can check
+        # super().create() of parents from the source code.
         return super().create(request, *args, **kwargs)
+
+
+# First thing that should come to the mind when wanting to destroy a resource is using
+# DestroyAPIView.
+
+class ProductDestroy(DestroyAPIView):
+    queryset = Product.objects.all()
+    lookup_field = 'id'
+
+    # We want to clear the cache when deleting an object from,
+    # the Product Model so that the space can be used.
+    # We override the delete method and put the logic for clearing the cache
+    # for that particular product as well.
+    def delete(self, request, *args, **kwargs):
+        product_id = request.data.get('id')
+        response = super().delete(request, *args, **kwargs)
+        if response.status_code == 204:
+            from django.core.cache import cache
+            cache.delete(f'product_data_{product_id}')
+        return response

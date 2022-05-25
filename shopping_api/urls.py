@@ -14,5 +14,7 @@ urlpatterns = [
     path('api/v1/products/', api_views.ProductList.as_view(),
          name='listing-all-products'),
     path('api/v1/create-products/', api_views.ProductCreate.as_view(),
-         name='creating-all-products'),
+         name='creating-products'),
+    path('api/v1/delete-products/<int:id>', api_views.ProductDestroy.as_view(),
+         name='deleting-products'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
