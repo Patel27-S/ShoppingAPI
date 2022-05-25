@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
@@ -117,4 +117,43 @@ class ProductDestroy(DestroyAPIView):
         if response.status_code == 204:
             from django.core.cache import cache
             cache.delete(f'product_data_{product_id}')
+        return response
+
+
+class ProductRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    '''
+    Three endpoints in a single view. A product can be retrieved, 
+    updated and deleted.
+    '''
+
+    queryset = Product.objects.all()
+    lookup_field = 'id'
+
+    serializer_class = ProductSerializer
+
+    # We want to clear the cache when deleting an object from,
+    # the Product Model so that the space can be used.
+    # We override the delete method and put the logic for clearing the cache
+    # for that particular product as well.
+    def delete(self, request, *args, **kwargs):
+        product_id = request.data.get('id')
+        response = super().delete(request, *args, **kwargs)
+        if response.status_code == 204:
+            from django.core.cache import cache
+            cache.delete(f'product_data_{product_id}')
+        return response
+
+    # Overriding the default update() method, in order to
+    # update the cache of the product object which is updated.
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        # If the product was successfully updated, then adding the
+        # updated cache or updating the cache.
+        if response.status_code == 204:
+            from django.core.cache import cache
+            product = response.data
+            cache.set('product_data_{}'.format(product['id']), {
+                      'name': product['name'],
+                      'description': product['description'],
+                      'price': product['price']})
         return response
